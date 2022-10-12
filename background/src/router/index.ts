@@ -1,6 +1,51 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView,
+    redirect: 'goods',
+    children: [
+      {
+        path: 'goods',
+        name: 'goods',
+        meta: {
+          isShow: true,
+          title: '商品列表'
+        },
+        component: () => import(/*webpackChunkName:"goods"*/'../views/GoodsView.vue')
+      },
+      {
+        path: 'user',
+        name: 'user',
+        meta: {
+          isShow: true,
+          title: '用户列表'
+        },
+        component: () => import(/*webpackChunkName:"user"*/'../views/UserView.vue')
+      },
+      {
+        path: 'role',
+        name: 'role',
+        meta: {
+          isShow: true,
+          title: '角色列表'
+        },
+        component: () => import(/*webpackChunkName:"user"*/'../views/RoleView.vue')
+      },
+      {
+        path: 'authority',
+        name: 'authority',
+        meta: {
+          isShow: false,
+          title: '权限列表'
+        },
+        component: () => import(/*webpackChunkName:"user"*/'../views/AuthorityView.vue')
+      }
+    ]
+  },
   {
     path: '/login',
     name: 'login',
@@ -11,6 +56,14 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+router.beforeEach((to, from, next) => {
+  const token: string | null = localStorage.getItem('token')
+  if (!token && to.path !== '/login') {
+    next('./login')
+  } else {
+    next()
+  }
 })
 
 export default router
